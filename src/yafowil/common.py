@@ -1,3 +1,4 @@
+import types
 from yafowil.base import (
     factory,
     UNSET,
@@ -97,8 +98,7 @@ factory.register('file',
 def select_renderer(widget, data):
     optiontags = [] 
     value = _value(widget, data)
-    if isinstance(value, basestring):
-        # TODO:  what if value is an integer? 
+    if isinstance(value, basestring) or not hasattr(value, '__iter__'):
         value = [value]
     for key, term in vocabulary(widget.attrs.get('vocabulary', [])):
         option_attrs = {
@@ -181,10 +181,8 @@ factory.register('label', [], [label_renderer])
 def field_renderer(widget, data):
     div_attrs = {
         'id': cssid(widget, 'field'),
-        'class_': widget.attrs['class'],
+        'class_': cssclasses(widget, data, widget.attrs['class'])
     }
-    if widget.attrs.witherror and data['errors']:
-        div_attrs['class_'] += u' %s' % widget.attrs.witherror
     return tag('div', data.rendered, **div_attrs)
 
 factory.defaults['field.class'] = 'field'
